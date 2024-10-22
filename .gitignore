@@ -4,3 +4,5 @@ bin/*.exe
 dist/
 package/
 test.ts
+*.tmp
+*.tempgit status
