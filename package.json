@@ -1,0 +1,29 @@
+{
+  "name": "af-win-audio",
+  "version": "1.0.0",
+  "description": "Библиотека для работы с Windows Core Api Audio",
+  "main": "main.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WebAFilippov/af-win-audio.git"
+  },
+  "keywords": [
+    "Node",
+    "npm",
+    "library",
+    "process"
+  ],
+  "author": "AFilippov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/WebAFilippov/af-win-audio/issues"
+  },
+  "homepage": "https://github.com/WebAFilippov/af-win-audio#readme",
+  "devDependencies": {
+    "@types/node": "^22.7.8",
+    "typescript": "^5.6.3"
+  }
+}
