@@ -1,4 +1,7 @@
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
+import { terser } from 'rollup-plugin-terser';
 import copy from 'rollup-plugin-copy';
 import { execSync } from 'child_process';
 
@@ -15,6 +18,8 @@ export default {
     }
   ],
   plugins: [
+    resolve(), // Обработчик для разрешения модулей
+    commonjs(), // Обработка CommonJS модулей
     typescript({
       tsconfig: './tsconfig.json',  // Использование твоего tsconfig
       declaration: true,  // Генерация типов
@@ -33,7 +38,12 @@ export default {
         // Генерация деклараций типов через tsc
         execSync('npx tsc --emitDeclarationOnly');
       }
-    }
+    },
+    // terser() // Минификация
   ],
-  external: []  // Здесь можно указать внешние зависимости, которые не нужно бандлить
+  external: [
+    'node:child_process', 
+    'node:events',
+    'node:path',
+  ],  
 };

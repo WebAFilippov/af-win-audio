@@ -1,6 +1,6 @@
 import { ChildProcess, spawn } from 'node:child_process';
 import { EventEmitter } from 'node:events';
-import path from 'path';
+import path from 'node:path';
 
 // Экспорт типов
 type Range<Min extends number, Max extends number, Result extends number[] = []> =
@@ -44,7 +44,7 @@ interface AudioMonitorEvents {
 class AudioDeviceMonitor extends EventEmitter {
   // Определение процесса
   private audioDeviceProcess: ChildProcess | null = null;
-  private exePath = path.join('bin', 'af-win-audio.exe');
+  private exePath = path.join(__dirname, 'bin', 'af-win-audio.exe');
   // Аргументы инициализации
   private delay: number;
   private stepVolume: number;
