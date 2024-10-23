@@ -3,10 +3,11 @@ import { EventEmitter } from 'node:events';
 import path from 'node:path';
 
 // Экспорт типов
-export type Range<Min extends number, Max extends number, Result extends number[] = []> =
-  Result['length'] extends Max
-    ? Result[number]
-    : Range<Min, Max, [...Result, Result['length']]>;
+export type Range<
+  Min extends number,
+  Max extends number,
+  Result extends number[] = [],
+> = Result['length'] extends Max ? Result[number] : Range<Min, Max, [...Result, Result['length']]>;
 
 // Тип для процентов
 export type Percentage = Range<1, 101>;
@@ -51,11 +52,11 @@ export class AudioDeviceMonitor extends EventEmitter {
   // Парсинг информации
   private parsedInfo: IDevice = { id: '', name: '', volume: 0, muted: false };
   private change: IChange = {
-    "id": false,
-    "name": false,
-    "volume": false,
-    "muted": false
-  }
+    id: false,
+    name: false,
+    volume: false,
+    muted: false,
+  };
 
   constructor(options?: AudioMonitorOptions) {
     super();
@@ -67,7 +68,10 @@ export class AudioDeviceMonitor extends EventEmitter {
   }
 
   private start(): void {
-    this.audioDeviceProcess = spawn(this.exePath, [this.delay.toString(), this.stepVolume.toString()]);
+    this.audioDeviceProcess = spawn(this.exePath, [
+      this.delay.toString(),
+      this.stepVolume.toString(),
+    ]);
 
     if (this.audioDeviceProcess && this.audioDeviceProcess.stdout) {
       this.audioDeviceProcess.stdout.on('data', (data: Buffer) => {
@@ -87,7 +91,7 @@ export class AudioDeviceMonitor extends EventEmitter {
 
     // Обработка ошибок процесса C#
     this.audioDeviceProcess.stderr?.on('data', (data: Buffer): void => {
-      this.emit('error', `C# Error: ${data.toString("utf-8")}`);
+      this.emit('error', `C# Error: ${data.toString('utf-8')}`);
     });
 
     this.audioDeviceProcess.on('close', (code: number): void => {
@@ -178,4 +182,4 @@ export class AudioDeviceMonitor extends EventEmitter {
   }
 }
 
-export default AudioDeviceMonitor
+export default AudioDeviceMonitor;

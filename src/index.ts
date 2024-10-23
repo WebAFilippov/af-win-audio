@@ -59,7 +59,9 @@ export interface AudioMonitorEvents {
  * Реализация событийного механизма для аудио мониторинга.
  */
 class CustomEventEmitter {
-  private listeners: { [K in keyof AudioMonitorEvents]?: AudioMonitorEvents[K][] } = {};
+  private listeners: {
+    [K in keyof AudioMonitorEvents]?: AudioMonitorEvents[K][];
+  } = {};
 
   /**
    * Регистрирует слушателя для определенного события.
@@ -77,7 +79,15 @@ class CustomEventEmitter {
    * Вызывает все обработчики для заданного события.
    * @param {object} param - Параметры события, включающие название и аргументы.
    */
-  emit({ event, args }: { [K in keyof AudioMonitorEvents]: { event: K, args: Parameters<AudioMonitorEvents[K]> } }[keyof AudioMonitorEvents]) {
+  emit({
+    event,
+    args,
+  }: {
+    [K in keyof AudioMonitorEvents]: {
+      event: K;
+      args: Parameters<AudioMonitorEvents[K]>;
+    };
+  }[keyof AudioMonitorEvents]) {
     if (event === 'change') {
       const listeners = this.listeners.change || [];
       listeners.forEach((listener) => listener(...args));
@@ -102,12 +112,17 @@ class CustomEventEmitter {
  */
 class AudioDeviceMonitor {
   private audioDeviceProcess: ChildProcess | null = null;
-  private exePath = path.join('bin', 'af-win-audio.exe');
+  private exePath: string = '';
   private autoStart: boolean;
   private delay: number;
   private stepVolume: number;
   private parsedInfo: IDevice = { id: '', name: '', volume: 0, muted: false };
-  private change: IChange = { id: false, name: false, volume: false, muted: false };
+  private change: IChange = {
+    id: false,
+    name: false,
+    volume: false,
+    muted: false,
+  };
   private eventEmitter = new CustomEventEmitter();
 
   /**
@@ -127,10 +142,10 @@ class AudioDeviceMonitor {
   /**
    * Регистрирует обработчик для указанного события мониторинга.
    * В зависимости от типа события, обработчик принимает разные параметры.
-   * 
-   * @param {keyof AudioMonitorEvents} event - Название события для регистрации обработчика. 
+   *
+   * @param {keyof AudioMonitorEvents} event - Название события для регистрации обработчика.
    * Допустимые значения: 'change', 'error', 'exit', 'forceExit'.
-   * @param {AudioMonitorEvents[keyof AudioMonitorEvents]} listener - Функция-обработчик для указанного события. 
+   * @param {AudioMonitorEvents[keyof AudioMonitorEvents]} listener - Функция-обработчик для указанного события.
    * - Для события 'change': (deviceInfo: IDevice, change: IChange) => void
    * - Для события 'error': (message: string) => void
    * - Для события 'exit': (code: number) => void
@@ -140,7 +155,10 @@ class AudioDeviceMonitor {
   on(event: 'error', listener: (message: string) => void): void;
   on(event: 'exit', listener: (code: number) => void): void;
   on(event: 'forceExit', listener: (message: string) => void): void;
-  on(event: keyof AudioMonitorEvents, listener: AudioMonitorEvents[keyof AudioMonitorEvents]): void {
+  on(
+    event: keyof AudioMonitorEvents,
+    listener: AudioMonitorEvents[keyof AudioMonitorEvents]
+  ): void {
     this.eventEmitter.on(event, listener);
   }
 
@@ -155,7 +173,17 @@ class AudioDeviceMonitor {
       });
       return;
     }
-    this.audioDeviceProcess = spawn(this.exePath, [this.delay.toString(), this.stepVolume.toString()]);
+
+    if (process.env.DEV === 'true') {
+      this.exePath = path.join('bin', 'af-win-audio.exe');
+    } else {
+      this.exePath = path.join(__dirname, 'bin', 'af-win-audio.exe');
+    }
+    // Запуск процесса
+    this.audioDeviceProcess = spawn(this.exePath, [
+      this.delay.toString(),
+      this.stepVolume.toString(),
+    ]);
 
     // Обработка ошибок при запуске процесса
     this.audioDeviceProcess.on('error', (err) => {
@@ -195,7 +223,7 @@ class AudioDeviceMonitor {
     this.audioDeviceProcess.stderr?.on('data', (data: Buffer): void => {
       this.eventEmitter.emit({
         event: 'error',
-        args: [`C# Error: ${data.toString("utf-8")}`],
+        args: [`C# Error: ${data.toString('utf-8')}`],
       });
     });
 
@@ -222,7 +250,7 @@ class AudioDeviceMonitor {
       }
       setTimeout(() => process.exit(), 1000); // Небольшая задержка перед завершением
     });
-  }  
+  }
 
   /**
    * Увеличивает громкость устройства.
@@ -275,7 +303,7 @@ class AudioDeviceMonitor {
             this.audioDeviceProcess?.kill('SIGKILL');
             this.eventEmitter.emit({
               event: 'forceExit',
-              args: ['Process forcibly terminated.']
+              args: ['Process forcibly terminated.'],
             });
           }
         }, 3000);

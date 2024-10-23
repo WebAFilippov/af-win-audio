@@ -4,9 +4,9 @@
     "module": "ESNext",
     "moduleResolution": "node",
     "outDir": "./dist",
-    "declaration": true,  // Генерация деклараций типов
-    "declarationDir": "./dist",  // Директория для типов
-    "declarationMap": true,  // Включение карт для деклараций типов (опционально)  // Генерация только типов (без JS кода)
+    "declaration": true, // Генерация деклараций типов
+    "declarationDir": "./dist", // Директория для типов
+    "declarationMap": true, // Включение карт для деклараций типов (опционально)  // Генерация только типов (без JS кода)
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
