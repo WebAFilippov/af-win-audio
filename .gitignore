@@ -2,6 +2,5 @@ node_modules/
 *.log
 dist/
 package/
-test.ts
 *.tmp
-*.tempgit status
+*.temp

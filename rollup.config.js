@@ -44,7 +44,11 @@ export default {
         execSync('npx tsc --emitDeclarationOnly');
       }
     },
-    // terser() // Минификация
+    terser({
+      output: {
+        comments: true, // Сохранить комментарии
+      }
+    })
   ],
   external: [
     'node:child_process', 
