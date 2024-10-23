@@ -1,6 +1,6 @@
 {
   "name": "af-win-audio",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Библиотека для работы с громкость в Windows системах в NodeJS среде",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
@@ -11,7 +11,7 @@
     "build": "rollup -c",
     "build:types": "tsc --emitDeclarationOnly",
     "build:all": "npm run build && npm run build:types",
-    "process": "bun run --watch src/check_process.ts" 
+    "process": "bun run --watch src/check_process.ts"
   },
   "files": [
     "dist/**/*"
@@ -39,13 +39,10 @@
     "@rollup/plugin-commonjs": "^28.0.1",
     "@rollup/plugin-node-resolve": "^15.3.0",
     "@rollup/plugin-typescript": "^12.1.1",
+    "node-processlist": "^1.0.2",
     "rollup": "^4.24.0",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.36.0",
-    "typescript": "^5.6.3"
-  },
-  "dependencies": {
-    "node-processlist": "^1.0.2"
-  }
+    "typescript": "^5.6.3"  }
 }
