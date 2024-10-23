@@ -4,6 +4,7 @@ import typescript from '@rollup/plugin-typescript';
 import { terser } from 'rollup-plugin-terser';
 import copy from 'rollup-plugin-copy';
 import { execSync } from 'child_process';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 export default {
   input: 'src/index.ts', // Входной файл
@@ -18,6 +19,7 @@ export default {
     },
   ],
   plugins: [
+    visualizer({ filename: 'stats.html' }),
     resolve(), // Обработчик для разрешения модулей
     commonjs(), // Обработка CommonJS модулей
     typescript({
@@ -45,5 +47,6 @@ export default {
     //   }
     // })
   ],
+  treeshake: true,
   external: ['node:child_process', 'node:events', 'node:path'],
 };
