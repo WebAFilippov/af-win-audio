@@ -1,6 +1,7 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
+// import typescript from 'rollup-plugin-typescript2';
 import { terser } from 'rollup-plugin-terser';
 import copy from 'rollup-plugin-copy';
 import { execSync } from 'child_process';
@@ -20,9 +21,13 @@ export default {
   plugins: [
     resolve(), // Обработчик для разрешения модулей
     commonjs(), // Обработка CommonJS модулей
+    // typescript({
+    //   tsconfig: 'tsconfig.json', // Убедитесь, что у вас есть tsconfig.json с нужными настройками
+    //   useTsconfigDeclarationDir: true, // Генерировать декларации типов в указанной директории
+    // }),
     typescript({
       tsconfig: './tsconfig.json',  // Использование твоего tsconfig
-      declaration: true,  // Генерация типов
+      declaration: true,
       declarationDir: './dist',  // Типы внутри папки dist
       rootDir: './src'  // Сохранение структуры исходников
     }),

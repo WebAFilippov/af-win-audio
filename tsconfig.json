@@ -6,11 +6,11 @@
     "outDir": "./dist",
     "declaration": true,  // Генерация деклараций типов
     "declarationDir": "./dist",  // Директория для типов
-    "declarationMap": true,  // Включение карт для деклараций типов (опционально)
-    "emitDeclarationOnly": false,  // Генерация только типов (без JS кода)
+    "declarationMap": true,  // Включение карт для деклараций типов (опционально)  // Генерация только типов (без JS кода)
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "emitDeclarationOnly": true
   },
   "include": ["src/**/*", "src/index.ts", "index.ts"],
   "exclude": ["node_modules", "dist", "bin"]

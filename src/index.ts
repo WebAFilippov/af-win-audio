@@ -1,15 +1,6 @@
 import { ChildProcess, spawn } from 'node:child_process';
 import path from 'node:path';
 
-// Экспорт типов
-export type Range<Min extends number, Max extends number, Result extends number[] = []> =
-  Result['length'] extends Max
-    ? Result[number]
-    : Range<Min, Max, [...Result, Result['length']]>;
-
-// Тип для процентов
-export type Percentage = Range<1, 101>;
-
 // Опции мониторинга аудио
 export interface AudioMonitorOptions {
   delay?: number;
@@ -42,26 +33,38 @@ export interface AudioMonitorEvents {
 
 // Кастомная реализация системы событий
 class CustomEventEmitter {
-  private listeners: { [event: string]: Function[] } = {};
+  private listeners: { [K in keyof AudioMonitorEvents]?: AudioMonitorEvents[K][] } = {};
 
-  on(event: string, listener: Function) {
+  on<K extends keyof AudioMonitorEvents>(event: K, listener: AudioMonitorEvents[K]) {
     if (!this.listeners[event]) {
       this.listeners[event] = [];
     }
-    this.listeners[event].push(listener);
+    this.listeners[event]!.push(listener);
   }
 
-  emit(event: string, ...args: any[]) {
-    if (this.listeners[event]) {
-      this.listeners[event].forEach(listener => listener(...args));
+  emit({ event, args }: { [K in keyof AudioMonitorEvents]: { event: K, args: Parameters<AudioMonitorEvents[K]> } }[keyof AudioMonitorEvents]) {
+    if (event === 'change') {
+      const listeners = this.listeners.change || []
+      listeners.forEach((listener) => listener(...args))
+    }
+    if (event === 'error') {
+      const listeners = this.listeners.error || []
+      listeners.forEach((listener) => listener(...args))
+    }
+    if (event === 'exit') {
+      const listeners = this.listeners.exit || []
+      listeners.forEach((listener) => listener(...args))
+    }
+    if (event === 'forceExit') {
+      const listeners = this.listeners.forceExit || []
+      listeners.forEach((listener) => listener(...args))
     }
   }
 }
-
 // Класс для мониторинга аудиоустройств
-export class AudioDeviceMonitor {
+class AudioDeviceMonitor {
   private audioDeviceProcess: ChildProcess | null = null;
-  private exePath = path.join( 'bin', 'af-win-audio.exe');
+  private exePath = path.join('bin', 'af-win-audio.exe');
   private delay: number;
   private stepVolume: number;
   private parsedInfo: IDevice = { id: '', name: '', volume: 0, muted: false };
@@ -83,29 +86,52 @@ export class AudioDeviceMonitor {
   private start(): void {
     this.audioDeviceProcess = spawn(this.exePath, [this.delay.toString(), this.stepVolume.toString()]);
 
+    // Обработка ошибок при запуске процесса
+    this.audioDeviceProcess.on('error', (err) => {
+      this.eventEmitter.emit({
+        event: 'error',
+        args: [`Failed to start process: ${err.message}`]
+      });
+    });
+
     if (this.audioDeviceProcess && this.audioDeviceProcess.stdout) {
       this.audioDeviceProcess.stdout.on('data', (data: Buffer) => {
         try {
           const parsedData = JSON.parse(data.toString());
           this.checkChange(parsedData);
           this.parsedInfo = parsedData;
-          this.eventEmitter.emit('change', this.parsedInfo, this.change);
+          this.eventEmitter.emit({
+            event: 'change',
+            args: [this.parsedInfo, this.change],
+          });
           this.defaultChange();
         } catch (e) {
-          this.eventEmitter.emit('error', `Failed to parse data: ${e}`);
+          this.eventEmitter.emit({
+            event: 'error',
+            args: [`Failed to parse data: ${e}`],
+          });
         }
       });
     } else {
-      this.eventEmitter.emit('error', 'stdout not available.');
+      this.eventEmitter.emit({
+        event: 'error',
+        args: ['Process stdout not available.'],
+      });
     }
 
     // Обработка ошибок процесса C#
     this.audioDeviceProcess.stderr?.on('data', (data: Buffer): void => {
-      this.eventEmitter.emit('error', `C# Error: ${data.toString("utf-8")}`);
+      this.eventEmitter.emit({
+        event: 'error',
+        args: [`C# Error: ${data.toString("utf-8")}`],
+      });
     });
 
     this.audioDeviceProcess.on('close', (code: number): void => {
-      this.eventEmitter.emit('exit', code);
+      this.eventEmitter.emit({
+        event: 'exit',
+        args: [code],
+      });
     });
 
     // Обработка завершения основного процесса Node.js
@@ -114,7 +140,7 @@ export class AudioDeviceMonitor {
       if (this.audioDeviceProcess) {
         this.audioDeviceProcess.kill('SIGTERM');
       }
-      process.exit();
+      setTimeout(() => process.exit(), 1000); // Небольшая задержка перед завершением
     });
 
     process.on('SIGTERM', () => {
@@ -122,11 +148,11 @@ export class AudioDeviceMonitor {
       if (this.audioDeviceProcess) {
         this.audioDeviceProcess.kill('SIGTERM');
       }
-      process.exit();
+      setTimeout(() => process.exit(), 1000); // Небольшая задержка перед завершением
     });
   }
 
-  public upVolume(step?: Percentage): void {
+  public upVolume(step?: number): void {
     if (this.audioDeviceProcess && this.audioDeviceProcess.stdin) {
       if (step) {
         this.audioDeviceProcess.stdin.write(`upVolume ${step}\n`);
@@ -134,11 +160,14 @@ export class AudioDeviceMonitor {
         this.audioDeviceProcess.stdin.write('upVolume\n');
       }
     } else {
-      this.eventEmitter.emit('error', 'Process not started or stdin not available.');
+      this.eventEmitter.emit({
+        event: 'error',
+        args: ['Process not started or stdin not available.'],
+      });
     }
   }
 
-  public downVolume(step?: Percentage): void {
+  public downVolume(step?: number): void {
     if (this.audioDeviceProcess && this.audioDeviceProcess.stdin) {
       if (step) {
         this.audioDeviceProcess.stdin.write(`downVolume ${step}\n`);
@@ -146,7 +175,10 @@ export class AudioDeviceMonitor {
         this.audioDeviceProcess.stdin.write('downVolume\n');
       }
     } else {
-      this.eventEmitter.emit('error', 'Process not started or stdin not available.');
+      this.eventEmitter.emit({
+        event: 'error',
+        args: ['Process not started or stdin not available.'],
+      });
     }
   }
 
@@ -157,14 +189,23 @@ export class AudioDeviceMonitor {
         setTimeout(() => {
           if (!this.audioDeviceProcess?.killed) {
             this.audioDeviceProcess?.kill('SIGKILL');
-            this.eventEmitter.emit('forceExit', 'Process forcibly terminated.');
+            this.eventEmitter.emit({
+              event: 'forceExit',
+              args: ['Process forcibly terminated.']
+            });
           }
         }, 3000);
       } else {
-        this.eventEmitter.emit('error', 'Process already terminated.');
+        this.eventEmitter.emit({
+          event: 'error',
+          args: ['Process already terminated.'],
+        });
       }
     } else {
-      this.eventEmitter.emit('error', 'Process not started.');
+      this.eventEmitter.emit({
+        event: 'error',
+        args: ['Process not started.'],
+      });
     }
   }
 
