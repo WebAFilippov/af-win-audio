@@ -1,4 +1,4 @@
-import AudioDeviceMonitor from './index';
+import AudioDeviceMonitor from 'af-win-audio';
 
 const af = new AudioDeviceMonitor();
 

@@ -1,6 +1,6 @@
 {
   "name": "af-win-audio",
-  "version": "1.0.6",
+  "version": "1.0.24",
   "author": "AFilippov",
   "repository": {
     "type": "git",
@@ -8,8 +8,6 @@
   },
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
-  "type": "module",
-  "types": "dist/index.d.ts",
   "devDependencies": {
     "@eslint/js": "^9.13.0",
     "@rollup/plugin-commonjs": "^28.0.1",
@@ -31,6 +29,9 @@
     "rollup-plugin-visualizer": "^5.12.0",
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.11.0"
+  },
+  "bin": {
+    "af-win-audio": "./bin/cli.js"
   },
   "bugs": {
     "url": "https://github.com/WebAFilippov/af-win-audio/issues"
@@ -57,7 +58,12 @@
     "build:all": "npm run build && npm run build:types",
     "process": "bun run --watch src/check_process.ts",
     "format": "prettier --write .",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "postinstall": "echo 'Installation complete. You can run af-win-audio init to configure.'"
+  },
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "@inquirer/select": "^4.0.0"
   }
-  
 }
