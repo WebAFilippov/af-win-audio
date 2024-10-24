@@ -6,3 +6,4 @@
 Добавить --version
 Добавить поддержку linux и macos
 Сделать невозможно запуска кода если не было init. при инит копировать файл с соседней папки
+Переработать еслинт - https://eslint.org/docs/latest/use/getting-started

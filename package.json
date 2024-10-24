@@ -59,7 +59,8 @@
     "process": "bun run --watch src/check_process.ts",
     "format": "prettier --write .",
     "lint": "eslint .",
-    "postinstall": "echo 'Installation complete. You can run af-win-audio init to configure.'"
+    "postinstall": "echo 'Installation complete. You can run af-win-audio init to configure.'",
+    "publish": "npm run build:all && npm publish --tag beta"
   },
   "type": "module",
   "types": "dist/index.d.ts",
