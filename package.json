@@ -1,6 +1,6 @@
 {
   "name": "af-win-audio",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "author": "AFilippov",
   "repository": {
     "type": "git",
@@ -35,9 +35,6 @@
       "globby": "^11.0.0"
     }
   },
-  "bin": {
-    "af-win-audio": "./bin/cli.js"
-  },
   "bugs": {
     "url": "https://github.com/WebAFilippov/af-win-audio/issues"
   },
@@ -61,12 +58,11 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "process": "bun run --watch src/check_process.ts",
-    "test": "DEV=true bun run --watch src/TEST.ts",
+    "dev": "DEV=true bun run --watch src/TEST.ts",
     "build": "rollup -c",
     "build:types": "tsc --emitDeclarationOnly",
     "build:all": "echo 'Начинаю сборку' | npm run lint && npm run clean && npm run build && npm run build:types",
-    "postinstall": "echo 'Installation complete. You can run af-win-audio init to configure.'",
-    "publish": "npm run build:all && npm publish --tag beta"
+    "publish": "npm publish --tag beta"
   },
   "type": "module",
   "types": "dist/index.d.ts",

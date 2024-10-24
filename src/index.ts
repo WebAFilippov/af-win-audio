@@ -116,8 +116,8 @@ class AudioDeviceMonitor {
   private autoStart: boolean;
   private delay: number;
   private stepVolume: number;
-  private parsedInfo: IDevice = { id: '', name: '', volume: 0, muted: false };
-  private change: IChange = {
+  public deviceInfo: IDevice = { id: '', name: '', volume: 0, muted: false };
+  private deviceChange: IChange = {
     id: false,
     name: false,
     volume: false,
@@ -197,12 +197,12 @@ class AudioDeviceMonitor {
     if (this.audioDeviceProcess && this.audioDeviceProcess.stdout) {
       this.audioDeviceProcess.stdout.on('data', (data: Buffer) => {
         try {
-          const parsedData = JSON.parse(data.toString());
-          this.checkChange(parsedData);
-          this.parsedInfo = parsedData;
+          const deviceInfo = JSON.parse(data.toString());
+          this.checkChange(deviceInfo);
+          this.deviceInfo = deviceInfo;
           this.eventEmitter.emit({
             event: 'change',
-            args: [this.parsedInfo, this.change],
+            args: [this.deviceInfo, this.deviceChange],
           });
           this.defaultChange();
         } catch (e) {
@@ -328,8 +328,8 @@ class AudioDeviceMonitor {
    */
   private checkChange(newDeviceInfo: IDevice): void {
     for (const key in newDeviceInfo) {
-      if (newDeviceInfo[key as keyof IDevice] !== this.parsedInfo[key as keyof IDevice]) {
-        this.change[key as keyof IChange] = true;
+      if (newDeviceInfo[key as keyof IDevice] !== this.deviceInfo[key as keyof IDevice]) {
+        this.deviceChange[key as keyof IChange] = true;
       }
     }
   }
@@ -338,7 +338,7 @@ class AudioDeviceMonitor {
    * Сбрасывает изменения состояния после их обработки.
    */
   private defaultChange(): void {
-    this.change = { id: false, name: false, volume: false, muted: false };
+    this.deviceChange = { id: false, name: false, volume: false, muted: false };
   }
 }
 

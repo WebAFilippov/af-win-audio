@@ -30,8 +30,7 @@ export default {
     }),
     copy({
       targets: [
-        { src: 'bin/af-win-audio.exe', dest: 'dist/src/' },
-        { src: 'bin/af-win-audio-extra.exe', dest: 'dist/src/' }, // Копирование exe файла
+        { src: 'bin/af-win-audio.exe', dest: 'dist/bin/' },
       ],
       verbose: true
     }),
