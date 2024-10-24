@@ -12,6 +12,7 @@
     "@eslint/js": "^9.13.0",
     "@rollup/plugin-commonjs": "^28.0.1",
     "@rollup/plugin-node-resolve": "^15.3.0",
+    "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.1",
     "@types/bun": "latest",
     "@typescript-eslint/eslint-plugin": "^8.11.0",
@@ -24,11 +25,15 @@
     "prettier": "^3.3.3",
     "rollup": "^4.24.0",
     "rollup-plugin-copy": "^3.5.0",
-    "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.36.0",
     "rollup-plugin-visualizer": "^5.12.0",
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.11.0"
+  },
+  "overrides": {
+    "rollup-plugin-copy": {
+      "globby": "^11.0.0"
+    }
   },
   "bin": {
     "af-win-audio": "./bin/cli.js"
@@ -38,7 +43,7 @@
   },
   "description": "Библиотека для работы с громкость в Windows системах в NodeJS среде",
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=14.0.0"
   },
   "files": [
     "dist/**/*"
@@ -52,13 +57,14 @@
   ],
   "license": "MIT",
   "scripts": {
+    "clean": "rm -rf dist",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "process": "bun run --watch src/check_process.ts",
     "test": "DEV=true bun run --watch src/TEST.ts",
     "build": "rollup -c",
     "build:types": "tsc --emitDeclarationOnly",
-    "build:all": "npm run build && npm run build:types",
-    "process": "bun run --watch src/check_process.ts",
-    "format": "prettier --write .",
-    "lint": "eslint .",
+    "build:all": "echo 'Начинаю сборку' | npm run lint && npm run clean && npm run build && npm run build:types",
     "postinstall": "echo 'Installation complete. You can run af-win-audio init to configure.'",
     "publish": "npm run build:all && npm publish --tag beta"
   },

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import select from '@inquirer/select';
 import { fileURLToPath } from 'url'; // Импортируем функцию fileURLToPath
-import { dirname } from 'path';
+import { dirname } from 'node:path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -51,7 +51,7 @@ async function install() {
   }
 }
 
-if (process.argv[2] === 'init') {
+if (process.argv[1] === 'af-win-audio' && process.argv[2] === 'init') {
   install().catch((error) => {
     console.error('Ошибка при инициализации:', error);
   });

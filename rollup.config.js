@@ -1,7 +1,7 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
-import { terser } from 'rollup-plugin-terser';
+import terser from '@rollup/plugin-terser';
 import copy from 'rollup-plugin-copy';
 import { execSync } from 'child_process';
 import { visualizer } from 'rollup-plugin-visualizer';
@@ -30,9 +30,10 @@ export default {
     }),
     copy({
       targets: [
-        { src: 'bin/af-win-audio.exe', dest: 'dist/bin/' },
-        { src: 'bin/af-win-audio-extra.exe', dest: 'dist/bin/' }, // Копирование exe файла
+        { src: 'bin/af-win-audio.exe', dest: 'dist/src/' },
+        { src: 'bin/af-win-audio-extra.exe', dest: 'dist/src/' }, // Копирование exe файла
       ],
+      verbose: true
     }),
     {
       name: 'generate-types',
@@ -41,12 +42,12 @@ export default {
         execSync('npx tsc --emitDeclarationOnly');
       },
     },
-    // terser({
-    //   output: {
-    //     comments: true, // Сохранить комментарии
-    //   }
-    // })
+    terser({
+      output: {
+        comments: true, // Сохранить комментарии
+      },
+    }),
   ],
   treeshake: true,
-  external: ['node:child_process', 'node:events', 'node:path'],
+  external: ['node:child_process', 'node:path'],
 };
