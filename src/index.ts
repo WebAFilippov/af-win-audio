@@ -116,7 +116,7 @@ class AudioDeviceMonitor {
   private autoStart: boolean;
   private delay: number;
   private stepVolume: number;
-  public deviceInfo: IDevice = { id: '', name: '', volume: 0, muted: false };
+  private deviceInfo: IDevice = { id: '', name: '', volume: 0, muted: false };
   private deviceChange: IChange = {
     id: false,
     name: false,
