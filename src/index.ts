@@ -361,7 +361,9 @@ class AudioDeviceMonitor {
 
   public updateSettings(options: UpdateOptions): void {
     options.delay && this.setDelay(options.delay)
-    options.step && this.setStepVolume(options.step)
+    if (options.step !== undefined) {
+      this.setStepVolume(options.step)
+    }
   }
 
   // Метод для изменения задержки
@@ -386,12 +388,12 @@ class AudioDeviceMonitor {
   // Метод для изменения шага громкости
   private setStepVolume(newStep: number): void {
     if (this.audioDeviceProcess && this.audioDeviceProcess.stdin) {
-      if (newStep > 0) {
-        this.step = newStep > 100 ? 100 : newStep
+      if (newStep > 0 && newStep <= 100) {
+        this.step = newStep
         this.printAlertMsg(`Шаг громкости обновлён до ${this.step}.`)
         this.audioDeviceProcess.stdin.write(`setStepVolume ${this.step}\n`)
       } else {
-        this.printAlertMsg('Шаг громкости должен быть больше 0.')
+        this.printAlertMsg('Шаг громкости должен быть больше в диапозоне от 1 до 100.') // error
       }
     } else {
       this.log('Процесс не запущен или стандартный ввод недоступен.')
