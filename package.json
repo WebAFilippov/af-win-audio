@@ -1,6 +1,6 @@
 {
   "name": "af-win-audio",
-  "version": "1.2.0",
+  "version": "1.3.1",
   "author": "AFilippov",
   "repository": {
     "type": "git",
@@ -62,7 +62,7 @@
     "build": "rollup -c",
     "build:types": "tsc --emitDeclarationOnly",
     "build:all": "echo 'Начинаю сборку' | npm run lint && npm run clean && npm run build && npm run build:types",
-    "publish": "npm publish --tag beta"
+    "publish": "npm publish"
   },
   "type": "module",
   "types": "dist/index.d.ts"
