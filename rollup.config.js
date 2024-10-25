@@ -1,10 +1,10 @@
-import resolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
-import typescript from '@rollup/plugin-typescript';
-import terser from '@rollup/plugin-terser';
-import copy from 'rollup-plugin-copy';
-import { execSync } from 'child_process';
-import { visualizer } from 'rollup-plugin-visualizer';
+import resolve from '@rollup/plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
+import typescript from '@rollup/plugin-typescript'
+import terser from '@rollup/plugin-terser'
+import copy from 'rollup-plugin-copy'
+import { execSync } from 'child_process'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 export default {
   input: 'src/index.ts', // Входной файл
@@ -29,16 +29,14 @@ export default {
       rootDir: './src', // Сохранение структуры исходников
     }),
     copy({
-      targets: [
-        { src: 'bin/af-win-audio.exe', dest: 'dist/bin/' },
-      ],
-      verbose: true
+      targets: [{ src: 'bin/af-win-audio.exe', dest: 'dist/bin/' }],
+      verbose: true,
     }),
     {
       name: 'generate-types',
       buildEnd: () => {
         // Генерация деклараций типов через tsc
-        execSync('npx tsc --emitDeclarationOnly');
+        execSync('npx tsc --emitDeclarationOnly')
       },
     },
     terser({
@@ -49,4 +47,4 @@ export default {
   ],
   treeshake: true,
   external: ['node:child_process', 'node:path'],
-};
+}

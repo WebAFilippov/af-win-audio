@@ -1,6 +1,6 @@
-import eslintPluginPrettier from 'eslint-plugin-prettier';
-import typescriptParser from '@typescript-eslint/parser';
-import eslintPluginTypescript from '@typescript-eslint/eslint-plugin';
+import eslintPluginPrettier from 'eslint-plugin-prettier'
+import typescriptParser from '@typescript-eslint/parser'
+import eslintPluginTypescript from '@typescript-eslint/eslint-plugin'
 
 export default [
   {
@@ -28,10 +28,9 @@ export default [
       'prettier/prettier': 'error', // Ошибка, если код не отформатирован по Prettier
       '@typescript-eslint/no-unused-vars': ['warn'], // Предупреждение о неиспользуемых переменных в TS
       '@typescript-eslint/explicit-module-boundary-types': 'off', // Не требовать явного указания типов на границах модулей
-      semi: ['error', 'always'], // Требование точки с запятой
       quotes: ['error', 'single'], // Одинарные кавычки для строк
       'no-console': 'off', // Отключаем правило, запрещающее console.log
       indent: ['error', 2], // Отступы в 2 пробела
     },
   },
-];
+]
