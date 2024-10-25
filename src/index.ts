@@ -185,11 +185,7 @@ class AudioDeviceMonitor {
    */
   public start(): void {
     if (this.audioDeviceProcess) {
-      this.log('Процесс уже запущен.')
-      this.eventEmitter.emit({
-        event: 'error',
-        args: ['Процесс уже запущен.'],
-      })
+      this.printMessage('error', 'Процесс уже запущен.')
       return
     }
 
@@ -203,11 +199,7 @@ class AudioDeviceMonitor {
 
     // Обработка ошибок при запуске процесса
     this.audioDeviceProcess.on('error', err => {
-      this.log(`Не удалось запустить процесс: ${err.message}`)
-      this.eventEmitter.emit({
-        event: 'error',
-        args: [`Не удалось запустить процесс: ${err.message}`],
-      })
+      this.printMessage('error', `Не удалось запустить процесс: ${err.message}`)
     })
 
     // Обработка данных из stdout процесса
@@ -223,28 +215,16 @@ class AudioDeviceMonitor {
           })
           this.defaultChange()
         } catch (e) {
-          this.log(`Не удалось обработать данные: ${e}`)
-          this.eventEmitter.emit({
-            event: 'error',
-            args: [`Не удалось обработать данные: ${e}`],
-          })
+          this.printMessage('error', `Не удалось обработать данные: ${e}`)
         }
       })
     } else {
-      this.log('Стандартный вывод процесса недоступен.')
-      this.eventEmitter.emit({
-        event: 'error',
-        args: ['Стандартный вывод процесса недоступен.'],
-      })
+      this.printMessage('error', 'Стандартный вывод процесса недоступен.')
     }
 
     // Обработка ошибок процесса
     this.audioDeviceProcess.stderr?.on('data', (data: Buffer): void => {
-      this.log(`C# Ошибка: ${data.toString('utf-8')}`)
-      this.eventEmitter.emit({
-        event: 'error',
-        args: [`C# Ошибка: ${data.toString('utf-8')}`],
-      })
+      this.printMessage('error', `C# Ошибка: ${data.toString('utf-8')}`)
     })
 
     this.audioDeviceProcess.on('close', (code: number | null): void => {
@@ -256,12 +236,7 @@ class AudioDeviceMonitor {
       } else {
         exitMessage = `Ошибка код: ${code}`
       }
-
-      this.log(exitMessage)
-      this.eventEmitter.emit({
-        event: 'exit',
-        args: [exitMessage],
-      })
+      this.printMessage('exit', exitMessage)
     })
 
     // Обработка завершения основного процесса Node.js
@@ -287,18 +262,14 @@ class AudioDeviceMonitor {
   public upVolume(step?: number): void {
     if (this.audioDeviceProcess && this.audioDeviceProcess.stdin) {
       if (step) {
-        this.printAlertMsg(`Увеличить громкость на ${step}.`)
+        this.printMessage('alert', `Увеличить громкость на ${step}.`)
         this.audioDeviceProcess.stdin.write(`upVolume ${step}\n`)
       } else {
-        this.printAlertMsg('Увеличить громкость.')
+        this.printMessage('alert', 'Увеличить громкость.')
         this.audioDeviceProcess.stdin.write('upVolume\n')
       }
     } else {
-      this.log('Процесс не запущен или стандартный ввод недоступен.')
-      this.eventEmitter.emit({
-        event: 'error',
-        args: ['Процесс не запущен или стандартный ввод недоступен.'],
-      })
+      this.printMessage('error', 'Процесс не запущен или стандартный ввод недоступен.')
     }
   }
 
@@ -309,18 +280,14 @@ class AudioDeviceMonitor {
   public downVolume(step?: number): void {
     if (this.audioDeviceProcess && this.audioDeviceProcess.stdin) {
       if (step) {
-        this.printAlertMsg(`Уменьшить громкость на ${step}.`)
+        this.printMessage('alert', `Уменьшить громкость на ${step}.`)
         this.audioDeviceProcess.stdin.write(`downVolume ${step}\n`)
       } else {
-        this.printAlertMsg('Уменьшить громкость.')
+        this.printMessage('alert', 'Уменьшить громкость.')
         this.audioDeviceProcess.stdin.write('downVolume\n')
       }
     } else {
-      this.log('Процесс не запущен или стандартный ввод недоступен.')
-      this.eventEmitter.emit({
-        event: 'error',
-        args: ['Процесс не запущен или стандартный ввод недоступен.'],
-      })
+      this.printMessage('error', 'Процесс не запущен или стандартный ввод недоступен.')
     }
   }
 
@@ -335,27 +302,15 @@ class AudioDeviceMonitor {
         setTimeout(() => {
           if (this.audioDeviceProcess?.killed === false) {
             this.audioDeviceProcess?.kill('SIGKILL')
-            this.log('Процесс был принудительно завершён.')
-            this.eventEmitter.emit({
-              event: 'forceExit',
-              args: ['Процесс был принудительно завершён.'],
-            })
+            this.printMessage('forceExit', 'Процесс был принудительно завершён.')
           }
         }, 3000)
       } else {
-        this.log('Процесс уже завершён.')
-        this.eventEmitter.emit({
-          event: 'error',
-          args: ['Процесс уже завершён.'],
-        })
+        this.printMessage('error', 'Процесс уже завершён.')
       }
       this.audioDeviceProcess = null
     } else {
-      this.log('Нет процесса для остановки.')
-      this.eventEmitter.emit({
-        event: 'error',
-        args: ['Нет процесса для остановки.'],
-      })
+      this.printMessage('error', 'Нет процесса для остановки.')
     }
   }
 
@@ -371,17 +326,13 @@ class AudioDeviceMonitor {
     if (this.audioDeviceProcess && this.audioDeviceProcess.stdin) {
       if (newDelay >= 100) {
         this.delay = newDelay
-        this.printAlertMsg(`Задержка обновлена до ${this.delay} мс.`)
+        this.printMessage('alert', `Задержка обновлена до ${this.delay} мс.`)
         this.audioDeviceProcess.stdin.write(`setDelay ${this.delay}\n`)
       } else {
-        this.printAlertMsg('Задержка должна быть не менее 100 мс.')
+        this.printMessage('alert', 'Задержка должна быть не менее 100 мс.')
       }
     } else {
-      this.log('Процесс не запущен или стандартный ввод недоступен.')
-      this.eventEmitter.emit({
-        event: 'error',
-        args: ['Процесс не запущен или стандартный ввод недоступен.'],
-      })
+      this.printMessage('error', 'Процесс не запущен или стандартный ввод недоступен.')
     }
   }
 
@@ -390,17 +341,13 @@ class AudioDeviceMonitor {
     if (this.audioDeviceProcess && this.audioDeviceProcess.stdin) {
       if (newStep > 0 && newStep <= 100) {
         this.step = newStep
-        this.printAlertMsg(`Шаг громкости обновлён до ${this.step}.`)
+        this.printMessage('alert', `Шаг громкости обновлён до ${this.step}.`)
         this.audioDeviceProcess.stdin.write(`setStepVolume ${this.step}\n`)
       } else {
-        this.printAlertMsg('Шаг громкости должен быть больше в диапозоне от 1 до 100.') // error
+        this.printMessage('error', 'Шаг громкости должен быть больше в диапозоне от 1 до 100.')
       }
     } else {
-      this.log('Процесс не запущен или стандартный ввод недоступен.')
-      this.eventEmitter.emit({
-        event: 'error',
-        args: ['Процесс не запущен или стандартный ввод недоступен.'],
-      })
+      this.printMessage('error', 'Процесс не запущен или стандартный ввод недоступен.')
     }
   }
 
@@ -412,12 +359,10 @@ class AudioDeviceMonitor {
     for (const key in newDeviceInfo) {
       if (newDeviceInfo[key as keyof IDevice] !== this.deviceInfo[key as keyof IDevice]) {
         this.deviceChange[key as keyof IChange] = true
-        this.eventEmitter.emit({
-          event: 'alert',
-          args: [
-            `${newDeviceInfo[key as keyof IDevice]} изменилось - ${this.deviceChange[key as keyof IChange]}`,
-          ],
-        })
+        this.printMessage(
+          'alert',
+          `${newDeviceInfo[key as keyof IDevice]} изменилось - ${this.deviceChange[key as keyof IChange]}`
+        )
       }
     }
   }
@@ -429,14 +374,20 @@ class AudioDeviceMonitor {
     this.deviceChange = { id: false, name: false, volume: false, muted: false }
   }
 
-  private log(...msg: string[]): void {
-    this.logger && console.log(...msg)
+  private log(event: keyof AudioMonitorEvents, ...msg: string[]): void {
+    if (this.logger) {
+      event === 'change' && console.log('change:: ', ...msg)
+      event === 'alert' && console.log('info:: ', ...msg)
+      event === 'error' && console.log('error:: ', ...msg)
+      event === 'exit' && console.log('exit:: ', ...msg)
+      event === 'forceExit' && console.log('forceExit:: ', ...msg)
+    }
   }
 
-  private printAlertMsg(message: string) {
-    this.log(message)
+  private printMessage(event: any, message: string) {
+    this.log(event, message)
     this.eventEmitter.emit({
-      event: 'alert',
+      event: event,
       args: [message],
     })
   }
