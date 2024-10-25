@@ -326,10 +326,10 @@ class AudioDeviceMonitor {
     if (this.audioDeviceProcess && this.audioDeviceProcess.stdin) {
       if (newDelay >= 100) {
         this.delay = newDelay
-        this.printMessage('alert', `Задержка обновлена до ${this.delay} мс.`)
+        this.printMessage('alert', `Задержка обновлена в ${this.delay} мс.`)
         this.audioDeviceProcess.stdin.write(`setDelay ${this.delay}\n`)
       } else {
-        this.printMessage('alert', 'Задержка должна быть не менее 100 мс.')
+        this.printMessage('error', 'Задержка должна быть не менее 100 мс.')
       }
     } else {
       this.printMessage('error', 'Процесс не запущен или стандартный ввод недоступен.')

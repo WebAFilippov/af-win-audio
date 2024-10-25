@@ -1,6 +1,6 @@
 {
   "name": "af-win-audio",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "author": "AFilippov",
   "repository": {
     "type": "git",
@@ -65,8 +65,5 @@
     "publish": "npm publish --tag beta"
   },
   "type": "module",
-  "types": "dist/index.d.ts",
-  "dependencies": {
-    "@inquirer/select": "^4.0.0"
-  }
+  "types": "dist/index.d.ts"
 }
