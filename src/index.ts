@@ -51,6 +51,7 @@ export interface IChange {
  * События аудио мониторинга.
  * @property {(deviceInfo: IDevice, change: IChange) => void} change - Событие, срабатывающее при изменении состояния устройства.
  * @property {(message: string) => void} alert - Событие оповещения.
+ * @property {(message: string) => void} command - Событие отправки команды.
  * @property {(message: string) => void} error - Событие ошибки при работе с устройством.
  * @property {(message: string) => void} exit - Событие завершения процесса мониторинга.
  * @property {(message: string) => void} forceExit - Событие принудительного завершения процесса мониторинга.
@@ -59,6 +60,7 @@ export interface IChange {
 export interface AudioMonitorEvents {
   change: (deviceInfo: IDevice, change: IChange) => void
   alert: (message: string) => void
+  command: (message: string) => void
   error: (message: string) => void
   exit: (message: string) => void
   forceExit: (message: string) => void
@@ -103,6 +105,10 @@ class CustomEventEmitter {
     }
     if (event === 'alert') {
       const listeners = this.listeners.alert || []
+      listeners.forEach(listener => listener(...args))
+    }
+    if (event === 'command') {
+      const listeners = this.listeners.command || []
       listeners.forEach(listener => listener(...args))
     }
     if (event === 'error') {
@@ -164,12 +170,14 @@ class AudioDeviceMonitor {
    * @param {AudioMonitorEvents[keyof AudioMonitorEvents]} listener - Функция-обработчик для указанного события.
    * - Для события 'change': (deviceInfo: IDevice, change: IChange) => void
    * - Для события 'alert': (message: string) => void
+   * - Для события 'command': (message: string) => void
    * - Для события 'error': (message: string) => void
    * - Для события 'exit': (message: number) => void
    * - Для события 'forceExit': (message: string) => void
    */
   on(event: 'change', listener: (deviceInfo: IDevice, change: IChange) => void): void
   on(event: 'alert', listener: (message: string) => void): void
+  on(event: 'command', listener: (message: string) => void): void
   on(event: 'error', listener: (message: string) => void): void
   on(event: 'exit', listener: (message: string) => void): void
   on(event: 'forceExit', listener: (message: string) => void): void
@@ -262,10 +270,10 @@ class AudioDeviceMonitor {
   public upVolume(step?: number): void {
     if (this.audioDeviceProcess && this.audioDeviceProcess.stdin) {
       if (step) {
-        this.printMessage('alert', `Увеличить громкость на ${step}.`)
+        this.printMessage('command', `Увеличить громкость на ${step}.`)
         this.audioDeviceProcess.stdin.write(`upVolume ${step}\n`)
       } else {
-        this.printMessage('alert', 'Увеличить громкость.')
+        this.printMessage('command', 'Увеличить громкость.')
         this.audioDeviceProcess.stdin.write('upVolume\n')
       }
     } else {
@@ -280,12 +288,39 @@ class AudioDeviceMonitor {
   public downVolume(step?: number): void {
     if (this.audioDeviceProcess && this.audioDeviceProcess.stdin) {
       if (step) {
-        this.printMessage('alert', `Уменьшить громкость на ${step}.`)
+        this.printMessage('command', `Уменьшить громкость на ${step}.`)
         this.audioDeviceProcess.stdin.write(`downVolume ${step}\n`)
       } else {
-        this.printMessage('alert', 'Уменьшить громкость.')
+        this.printMessage('command', 'Уменьшить громкость.')
         this.audioDeviceProcess.stdin.write('downVolume\n')
       }
+    } else {
+      this.printMessage('error', 'Процесс не запущен или стандартный ввод недоступен.')
+    }
+  }
+
+  public mute() {
+    if (this.audioDeviceProcess && this.audioDeviceProcess.stdin) {
+      this.printMessage('command', 'Звук заглушен.')
+      this.audioDeviceProcess.stdin.write('mute\n')
+    } else {
+      this.printMessage('error', 'Процесс не запущен или стандартный ввод недоступен.')
+    }
+  }
+
+  public unmute() {
+    if (this.audioDeviceProcess && this.audioDeviceProcess.stdin) {
+      this.printMessage('command', 'Звук восстановлен.')
+      this.audioDeviceProcess.stdin.write('unmute\n')
+    } else {
+      this.printMessage('error', 'Процесс не запущен или стандартный ввод недоступен.')
+    }
+  }
+
+  public toggleMute() {
+    if (this.audioDeviceProcess && this.audioDeviceProcess.stdin) {
+      this.printMessage('command', 'Переключение состояния звука выполнено.')
+      this.audioDeviceProcess.stdin.write('toggleMute\n')
     } else {
       this.printMessage('error', 'Процесс не запущен или стандартный ввод недоступен.')
     }
@@ -326,7 +361,7 @@ class AudioDeviceMonitor {
     if (this.audioDeviceProcess && this.audioDeviceProcess.stdin) {
       if (newDelay >= 100) {
         this.delay = newDelay
-        this.printMessage('alert', `Задержка обновлена в ${this.delay} мс.`)
+        this.printMessage('command', `Задержка установлена в ${this.delay} мс.`)
         this.audioDeviceProcess.stdin.write(`setDelay ${this.delay}\n`)
       } else {
         this.printMessage('error', 'Задержка должна быть не менее 100 мс.')
@@ -341,7 +376,7 @@ class AudioDeviceMonitor {
     if (this.audioDeviceProcess && this.audioDeviceProcess.stdin) {
       if (newStep > 0 && newStep <= 100) {
         this.step = newStep
-        this.printMessage('alert', `Шаг громкости обновлён до ${this.step}.`)
+        this.printMessage('command', `Шаг громкости обновлён до ${this.step}.`)
         this.audioDeviceProcess.stdin.write(`setStepVolume ${this.step}\n`)
       } else {
         this.printMessage('error', 'Шаг громкости должен быть больше в диапозоне от 1 до 100.')
@@ -359,10 +394,10 @@ class AudioDeviceMonitor {
     for (const key in newDeviceInfo) {
       if (newDeviceInfo[key as keyof IDevice] !== this.deviceInfo[key as keyof IDevice]) {
         this.deviceChange[key as keyof IChange] = true
-        this.printMessage(
-          'alert',
-          `${newDeviceInfo[key as keyof IDevice]} изменилось - ${this.deviceChange[key as keyof IChange]}`
-        )
+        // this.printMessage(
+        //   'alert',
+        //   `${newDeviceInfo[key as keyof IDevice]} изменилось - ${this.deviceChange[key as keyof IChange]}`
+        // )
       }
     }
   }
@@ -378,6 +413,7 @@ class AudioDeviceMonitor {
     if (this.logger) {
       event === 'change' && console.log('change:: ', ...msg)
       event === 'alert' && console.log('info:: ', ...msg)
+      event === 'command' && console.log('command:: ', ...msg)
       event === 'error' && console.log('error:: ', ...msg)
       event === 'exit' && console.log('exit:: ', ...msg)
       event === 'forceExit' && console.log('forceExit:: ', ...msg)
