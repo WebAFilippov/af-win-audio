@@ -4,7 +4,7 @@ import eslintPluginTypescript from '@typescript-eslint/eslint-plugin'
 
 export default [
   {
-    ignores: ['node_modules/**', 'dist/**', 'build/**'], // Игнорируем папки
+    ignores: ['node_modules/**', 'dist/**', 'build/**', 'src/TEST.ts'], // Игнорируем папки
   },
   {
     files: ['**/*.ts', '**/*.tsx'], // Указываем, что ESLint будет работать с TypeScript файлами

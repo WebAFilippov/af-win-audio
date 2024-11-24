@@ -1,5 +1,9 @@
 import { ChildProcess, spawn } from 'node:child_process'
 import path from 'node:path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 /**
  * Опции мониторинга аудио устройств.
@@ -14,7 +18,7 @@ export interface AudioMonitorOptions {
   step?: number
 }
 
-interface UpdateOptions {
+export interface UpdateOptions {
   delay?: number // Задержка между проверками
   step?: number // Шаг изменения громкости
 }
@@ -40,7 +44,7 @@ export interface IDevice {
  * @property {boolean} volume - Изменился ли уровень громкости.
  * @property {boolean} muted - Изменилось ли состояние отключения звука.
  */
-export interface IChange {
+interface IChange {
   id: boolean
   name: boolean
   volume: boolean
@@ -57,7 +61,7 @@ export interface IChange {
  * @property {(message: string) => void} forceExit - Событие принудительного завершения процесса мониторинга.
  *
  */
-export interface AudioMonitorEvents {
+interface AudioMonitorEvents {
   change: (deviceInfo: IDevice, change: IChange) => void
   alert: (message: string) => void
   command: (message: string) => void
@@ -129,7 +133,7 @@ class CustomEventEmitter {
 /**
  * Класс для мониторинга состояния аудиоустройств в системе.
  */
-class AudioDeviceMonitor {
+export class AudioDeviceMonitor {
   private audioDeviceProcess: ChildProcess | null = null
   private exePath: string = ''
   private deviceInfo: IDevice = { id: '', name: '', volume: 0, muted: false }
@@ -409,24 +413,11 @@ class AudioDeviceMonitor {
     this.deviceChange = { id: false, name: false, volume: false, muted: false }
   }
 
-  private log(event: keyof AudioMonitorEvents, ...msg: string[]): void {
-    if (this.logger) {
-      event === 'change' && console.log('change:: ', ...msg)
-      event === 'alert' && console.log('info:: ', ...msg)
-      event === 'command' && console.log('command:: ', ...msg)
-      event === 'error' && console.log('error:: ', ...msg)
-      event === 'exit' && console.log('exit:: ', ...msg)
-      event === 'forceExit' && console.log('forceExit:: ', ...msg)
-    }
-  }
-
-  private printMessage(event: any, message: string) {
-    this.log(event, message)
+  private printMessage(event: any, message: string): void {
+    this.logger && console.log(`#${event}:: `, message)
     this.eventEmitter.emit({
       event: event,
       args: [message],
     })
   }
 }
-
-export default AudioDeviceMonitor
