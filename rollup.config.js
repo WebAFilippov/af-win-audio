@@ -1,50 +1,24 @@
-import resolve from '@rollup/plugin-node-resolve'
-import commonjs from '@rollup/plugin-commonjs'
-import typescript from '@rollup/plugin-typescript'
-import terser from '@rollup/plugin-terser'
-import copy from 'rollup-plugin-copy'
-import { execSync } from 'child_process'
-import { visualizer } from 'rollup-plugin-visualizer'
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import typescript from '@rollup/plugin-typescript';
 
 export default {
-  input: 'src/index.ts', // Входной файл
+  input: 'src/index.ts',
   output: [
     {
-      file: 'dist/index.cjs.js', // CommonJS файл
-      format: 'cjs',
+      file: 'dist/index.cjs',
+      format: 'cjs', // CommonJS
     },
     {
-      file: 'dist/index.esm.js', // ESModule файл
-      format: 'es',
+      file: 'dist/index.mjs',
+      format: 'es', // ES Module
     },
   ],
   plugins: [
-    visualizer({ filename: 'stats.html' }),
-    resolve(), // Обработчик для разрешения модулей
-    commonjs(), // Обработка CommonJS модулей
+    resolve(),
+    commonjs(),
     typescript({
-      tsconfig: './tsconfig.json', // Использование твоего tsconfig
-      declaration: true,
-      declarationDir: './dist', // Типы внутри папки dist
-      rootDir: './src', // Сохранение структуры исходников
-    }),
-    copy({
-      targets: [{ src: 'bin/af-win-audio.exe', dest: 'dist/bin/' }],
-      verbose: true,
-    }),
-    {
-      name: 'generate-types',
-      buildEnd: () => {
-        // Генерация деклараций типов через tsc
-        execSync('npx tsc --emitDeclarationOnly')
-      },
-    },
-    terser({
-      output: {
-        comments: true, // Сохранить комментарии
-      },
+      tsconfig: './tsconfig.json',
     }),
   ],
-  treeshake: true,
-  external: ['node:child_process', 'node:path'],
-}
+};

@@ -2,16 +2,19 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ESNext",
-    "moduleResolution": "node",
-    "outDir": "./dist",
-    "declaration": true, // Генерация деклараций типов
-    "declarationDir": "./dist", // Директория для типов
-    "declarationMap": true, // Включение карт для деклараций типов (опционально)  // Генерация только типов (без JS кода)
-    "strict": true,
-    "esModuleInterop": true,
+
+    "declaration": true,             // Включение генерации деклараций
+    "declarationMap": true,          // (опционально) Карты деклараций для отладки
+    "emitDeclarationOnly": false,    // Генерация не только деклараций, но и JS-файлов
+    "outDir": "./dist",              // Директория для сборки
+    "strict": true,                  // Строгая типизация
+
     "skipLibCheck": true,
-    "emitDeclarationOnly": true
+    "allowJs": false,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true    
   },
-  "include": ["src/index.ts"],
-  "exclude": ["node_modules", "dist", "bin"]
+  "include": ["src/index.ts"],        // Включить файлы исходного кода
+  "exclude": ["node_modules", "dist"] // Исключить скомпилированные файлы
 }
