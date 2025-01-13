@@ -7,3 +7,6 @@ package/
 stats.html
 src/test.ts
 bun.lockb
+.prettierignore
+.prettierrc
+eslint.config.js
