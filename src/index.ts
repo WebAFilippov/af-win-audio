@@ -3,7 +3,10 @@ import EventEmitter from "events";
 import path from "path";
 import fs from "fs";
 import { createLogger, format, transports } from 'winston';
-import { packageDirectorySync } from 'pkg-dir';
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export interface AudioMonitorOptions {
   autoStart: boolean;
@@ -92,8 +95,7 @@ class AudioMonitor extends EventEmitter {
       this.execPath = this.options.execPath;
     } else {
       // Получение корневого пути пакета
-      const rootDir = packageDirectorySync() || process.cwd();
-      this.execPath = path.join(rootDir, 'bin', 'af-win-audio.exe');
+      this.execPath = path.join(__dirname, 'bin', 'af-win-audio.exe');
     }
 
     if (!fs.existsSync(this.execPath)) {
@@ -150,7 +152,7 @@ class AudioMonitor extends EventEmitter {
       if (this.process && this.process.stdout) {
         this.process.stdout.on('data', (dataBuffer: Buffer) => {
           try {
-            const data = JSON.parse(dataBuffer.toString());
+            const data = JSON.parse(dataBuffer.toString('utf-8'));
             this.logInfo('Получены данные:', data);
             this.emit('listen', {
               action: data.action,

@@ -6,17 +6,12 @@ export default {
   input: 'src/index.ts',
   output: [
     {
-      file: 'dist/index.cjs.js',
-      format: 'cjs',
-      sourcemap: true,
-      exports: 'default',
-    },
-    {
-      file: 'dist/index.esm.js',
+      file: 'dist/index.js',
       format: 'esm',
       sourcemap: true,
     },
   ],
+
   plugins: [
     typescript({ tsconfig: './tsconfig.json' }),
     terser(),
@@ -26,5 +21,5 @@ export default {
       ],
     }),
   ],
-  external: ['child_process', 'events', 'path', 'fs', 'winston', 'pkg-dir'],
+  external: ['child_process', 'events', 'path', 'fs', 'winston'],
 };
