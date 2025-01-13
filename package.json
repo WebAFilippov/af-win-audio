@@ -28,5 +28,10 @@
   "license": "MIT",
   "engines": {
     "bun": ">=0.6.0"
-  }
+  },
+  "keywords": [
+    "nodejs",
+    "windows",
+    "audio"
+  ]
 }
