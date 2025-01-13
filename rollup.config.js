@@ -1,24 +1,29 @@
-import resolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
+import { terser } from 'rollup-plugin-terser';
+import copy from 'rollup-plugin-copy';
 
 export default {
   input: 'src/index.ts',
   output: [
     {
-      file: 'dist/index.cjs',
-      format: 'cjs', // CommonJS
+      file: 'dist/index.js',
+      format: 'cjs',
+      sourcemap: true,
     },
     {
-      file: 'dist/index.mjs',
-      format: 'es', // ES Module
+      file: 'dist/index.esm.js',
+      format: 'esm',
+      sourcemap: true,
     },
   ],
   plugins: [
-    resolve(),
-    commonjs(),
-    typescript({
-      tsconfig: './tsconfig.json',
+    typescript(),
+    terser(),
+    copy({
+      targets: [
+        { src: 'bin/af-win-audio.exe', dest: 'dist/bin' },
+      ],
     }),
   ],
+  external: ['child_process', 'events', 'path', 'fs', 'winston', 'pkg-dir'],
 };

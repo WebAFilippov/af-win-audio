@@ -5,8 +5,5 @@ package/
 *.tmp
 *.temp
 stats.html
-src/TEST.ts
-src/check_process.ts
-ToDo.md
+src/test.ts
 bun.lockb
-test/

@@ -3,11 +3,11 @@
     "target": "ES2020",
     "module": "ESNext",
 
-    "declaration": true,             // Включение генерации деклараций
-    "declarationMap": true,          // (опционально) Карты деклараций для отладки
-    "emitDeclarationOnly": false,    // Генерация не только деклараций, но и JS-файлов
-    "outDir": "./dist",              // Директория для сборки
-    "strict": true,                  // Строгая типизация
+    "declaration": true,             
+    "declarationMap": true,          
+    "emitDeclarationOnly": false,    
+    "outDir": "./dist",             
+    "strict": true,                  
 
     "skipLibCheck": true,
     "allowJs": false,
@@ -15,6 +15,6 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true    
   },
-  "include": ["src/index.ts"],        // Включить файлы исходного кода
-  "exclude": ["node_modules", "dist"] // Исключить скомпилированные файлы
+  "include": ["src/index.ts"],        
+  "exclude": ["node_modules", "dist"] 
 }
